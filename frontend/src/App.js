@@ -1093,6 +1093,7 @@ function LancamentoDialog({ open, onOpenChange, onSave, editingItem }) {
 
 // Fixo Dialog
 function FixoDialog({ open, onOpenChange, onSave, editingItem }) {
+  const now = new Date();
   const [formData, setFormData] = useState({
     descricao: '',
     categoria: 'Outros',
@@ -1100,27 +1101,29 @@ function FixoDialog({ open, onOpenChange, onSave, editingItem }) {
     valor: '',
     responsavel: 'Davi',
     diaVencimento: 1,
-    mesInicio: '',
+    mesInicio: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`,
     mesFim: '',
     ativo: true
   });
 
   useEffect(() => {
-    if (editingItem) {
-      setFormData(editingItem);
-    } else {
-      const now = new Date();
-      setFormData({
-        descricao: '',
-        categoria: 'Outros',
-        tipo: 'saida',
-        valor: '',
-        responsavel: 'Davi',
-        diaVencimento: 1,
-        mesInicio: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`,
-        mesFim: '',
-        ativo: true
-      });
+    if (open) {
+      if (editingItem) {
+        setFormData(editingItem);
+      } else {
+        const now = new Date();
+        setFormData({
+          descricao: '',
+          categoria: 'Outros',
+          tipo: 'saida',
+          valor: '',
+          responsavel: 'Davi',
+          diaVencimento: 1,
+          mesInicio: `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`,
+          mesFim: '',
+          ativo: true
+        });
+      }
     }
   }, [editingItem, open]);
 

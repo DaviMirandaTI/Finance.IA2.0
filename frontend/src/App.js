@@ -958,7 +958,7 @@ function InvestimentosView({ investimentos, totalInvestido, saldoPlanejado, onAd
 // Lancamento Dialog
 function LancamentoDialog({ open, onOpenChange, onSave, editingItem }) {
   const [formData, setFormData] = useState({
-    data: '',
+    data: new Date().toISOString().split('T')[0],
     descricao: '',
     categoria: 'Outros',
     tipo: 'saida',
@@ -968,18 +968,20 @@ function LancamentoDialog({ open, onOpenChange, onSave, editingItem }) {
   });
 
   useEffect(() => {
-    if (editingItem) {
-      setFormData(editingItem);
-    } else {
-      setFormData({
-        data: new Date().toISOString().split('T')[0],
-        descricao: '',
-        categoria: 'Outros',
-        tipo: 'saida',
-        valor: '',
-        forma: 'pix',
-        observacao: ''
-      });
+    if (open) {
+      if (editingItem) {
+        setFormData(editingItem);
+      } else {
+        setFormData({
+          data: new Date().toISOString().split('T')[0],
+          descricao: '',
+          categoria: 'Outros',
+          tipo: 'saida',
+          valor: '',
+          forma: 'pix',
+          observacao: ''
+        });
+      }
     }
   }, [editingItem, open]);
 

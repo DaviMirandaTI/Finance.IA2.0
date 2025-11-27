@@ -523,7 +523,8 @@ function App() {
         onSave={salvarInvestimento}
         editingItem={editingItem}
       />
-    </div>
+      </div>
+    </>
   );
 }
 

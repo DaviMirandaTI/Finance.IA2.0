@@ -1060,19 +1060,19 @@ function LancamentoDialog({ open, onOpenChange, onSave, editingItem }) {
           </div>
           <div>
             <Label>Forma de Pagamento</Label>
-            <Select value={formData.forma} onValueChange={(v) => setFormData({ ...formData, forma: v })}>
-              <SelectTrigger data-testid="lancamento-forma-select">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="pix">PIX</SelectItem>
-                <SelectItem value="debito">Débito</SelectItem>
-                <SelectItem value="credito">Crédito</SelectItem>
-                <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                <SelectItem value="boleto">Boleto</SelectItem>
-                <SelectItem value="outro">Outro</SelectItem>
-              </SelectContent>
-            </Select>
+            <select 
+              value={formData.forma} 
+              onChange={(e) => setFormData({ ...formData, forma: e.target.value })}
+              className="flex h-9 w-full items-center justify-between rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              data-testid="lancamento-forma-select"
+            >
+              <option value="pix">PIX</option>
+              <option value="debito">Débito</option>
+              <option value="credito">Crédito</option>
+              <option value="dinheiro">Dinheiro</option>
+              <option value="boleto">Boleto</option>
+              <option value="outro">Outro</option>
+            </select>
           </div>
           <div className="col-span-2">
             <Label>Observação</Label>

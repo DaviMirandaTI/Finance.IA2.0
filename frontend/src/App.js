@@ -37,6 +37,9 @@ function App() {
   const [showFixoDialog, setShowFixoDialog] = useState(false);
   const [showInvestimentoDialog, setShowInvestimentoDialog] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
+  
+  // Ref for file input
+  const fileInputRef = useRef(null);
 
   // Load data from localStorage
   useEffect(() => {

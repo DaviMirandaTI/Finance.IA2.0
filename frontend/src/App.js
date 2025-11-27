@@ -464,13 +464,17 @@ function App() {
               <Download size={16} />
               {sidebarOpen && <span>Backup</span>}
             </Button>
-            <Button variant="outline" size="sm" className="backup-btn" asChild data-testid="restore-btn">
-              <label>
-                <Upload size={16} />
-                {sidebarOpen && <span>Restaurar</span>}
-                <input type="file" accept=".json" onChange={handleRestore} style={{ display: 'none' }} />
-              </label>
+            <Button variant="outline" size="sm" className="backup-btn" onClick={() => fileInputRef.current?.click()} data-testid="restore-btn">
+              <Upload size={16} />
+              {sidebarOpen && <span>Restaurar</span>}
             </Button>
+            <input 
+              ref={fileInputRef}
+              type="file" 
+              accept=".json" 
+              onChange={handleRestore} 
+              style={{ display: 'none' }} 
+            />
           </div>
         </div>
       </aside>

@@ -181,7 +181,7 @@ function App() {
       }
       return true;
     });
-  }, [lancamentosUsuario, periodoTipo, periodoMes, periodoAno, periodoInicio, periodoFim]);
+  }, [lancamentos, periodoTipo, periodoMes, periodoAno, periodoInicio, periodoFim]);
 
   const movimentosFiltrados = useMemo(() => {
     return movimentosUsuario.filter(m => {

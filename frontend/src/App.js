@@ -171,7 +171,7 @@ function App() {
 
   // Filter by period
   const lancamentosFiltrados = useMemo(() => {
-    return lancamentosUsuario.filter(l => {
+    return lancamentos.filter(l => {
       if (periodoTipo === "mes") {
         return l.data.startsWith(periodoMes);
       } else if (periodoTipo === "ano") {

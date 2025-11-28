@@ -2,16 +2,14 @@ import { useState, useEffect, useMemo, useRef } from "react";
 import "@/App.css";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-import { Menu, X, TrendingUp, TrendingDown, Wallet, Calendar, Target, PieChart, Download, Upload, LayoutDashboard, Receipt, Repeat, Zap, DollarSign } from "lucide-react";
+import { Menu, X, TrendingUp, TrendingDown, Wallet, Target, Download, Upload, LayoutDashboard, Receipt, Repeat, Zap, DollarSign } from "lucide-react";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -38,7 +36,6 @@ function App() {
   const [showInvestimentoDialog, setShowInvestimentoDialog] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   
-  // Ref for file input
   const fileInputRef = useRef(null);
 
   // Load data from localStorage
@@ -157,11 +154,7 @@ function App() {
 
   // Backup & Restore
   const handleBackup = () => {
-    const data = {
-      lancamentos,
-      fixos,
-      investimentos
-    };
+    const data = { lancamentos, fixos, investimentos };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -349,196 +342,190 @@ function App() {
       <div className="app-container">
         {/* Sidebar */}
         <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
-        <div className="sidebar-header">
-          <div className="logo">
-            <Wallet className="logo-icon" />
-            {sidebarOpen && <span className="logo-text">FinSystem</span>}
-          </div>
-          <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} data-testid="menu-toggle-btn">
-            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
-          </button>
-        </div>
-
-        <nav className="nav-menu">
-          <button 
-            className={`nav-item ${currentView === 'dashboard' ? 'active' : ''}`} 
-            onClick={() => setCurrentView('dashboard')}
-            data-testid="nav-dashboard-btn"
-          >
-            <LayoutDashboard size={20} />
-            {sidebarOpen && <span>Dashboard</span>}
-          </button>
-          <button 
-            className={`nav-item ${currentView === 'lancamentos' ? 'active' : ''}`} 
-            onClick={() => setCurrentView('lancamentos')}
-            data-testid="nav-lancamentos-btn"
-          >
-            <Receipt size={20} />
-            {sidebarOpen && <span>Lançamentos</span>}
-          </button>
-          <button 
-            className={`nav-item ${currentView === 'fixos' ? 'active' : ''}`} 
-            onClick={() => setCurrentView('fixos')}
-            data-testid="nav-fixos-btn"
-          >
-            <Repeat size={20} />
-            {sidebarOpen && <span>Fixos</span>}
-          </button>
-          <button 
-            className={`nav-item ${currentView === 'pagamento' ? 'active' : ''}`} 
-            onClick={() => setCurrentView('pagamento')}
-            data-testid="nav-pagamento-btn"
-          >
-            <Zap size={20} />
-            {sidebarOpen && <span>Pag. Inteligente</span>}
-          </button>
-          <button 
-            className={`nav-item ${currentView === 'investimentos' ? 'active' : ''}`} 
-            onClick={() => setCurrentView('investimentos')}
-            data-testid="nav-investimentos-btn"
-          >
-            <TrendingUp size={20} />
-            {sidebarOpen && <span>Investimentos</span>}
-          </button>
-        </nav>
-
-        <div className="sidebar-footer">
-          <div className="filter-section">
-            {sidebarOpen && <Label className="filter-label">Período</Label>}
-            <Select value={periodoTipo} onValueChange={setPeriodoTipo}>
-              <SelectTrigger className="filter-select" data-testid="periodo-tipo-select">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="mes">Mês</SelectItem>
-                <SelectItem value="ano">Ano</SelectItem>
-                <SelectItem value="intervalo">Intervalo</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {periodoTipo === "mes" && (
-              <Input 
-                type="month" 
-                value={periodoMes} 
-                onChange={(e) => setPeriodoMes(e.target.value)}
-                className="filter-input"
-                data-testid="periodo-mes-input"
-              />
-            )}
-
-            {periodoTipo === "ano" && (
-              <Input 
-                type="number" 
-                value={periodoAno} 
-                onChange={(e) => setPeriodoAno(e.target.value)}
-                placeholder="2025"
-                className="filter-input"
-                data-testid="periodo-ano-input"
-              />
-            )}
-
-            {periodoTipo === "intervalo" && (
-              <>
-                <Input 
-                  type="date" 
-                  value={periodoInicio} 
-                  onChange={(e) => setPeriodoInicio(e.target.value)}
-                  placeholder="Início"
-                  className="filter-input"
-                  data-testid="periodo-inicio-input"
-                />
-                <Input 
-                  type="date" 
-                  value={periodoFim} 
-                  onChange={(e) => setPeriodoFim(e.target.value)}
-                  placeholder="Fim"
-                  className="filter-input"
-                  data-testid="periodo-fim-input"
-                />
-              </>
-            )}
+          <div className="sidebar-header">
+            <div className="logo">
+              <Wallet className="logo-icon" />
+              {sidebarOpen && <span className="logo-text">FinSystem</span>}
+            </div>
+            <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} data-testid="menu-toggle-btn">
+              {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
 
-          <div className="backup-section">
-            <Button variant="outline" size="sm" onClick={handleBackup} className="backup-btn" data-testid="backup-btn">
-              <Download size={16} />
-              {sidebarOpen && <span>Backup</span>}
-            </Button>
-            <Button variant="outline" size="sm" className="backup-btn" onClick={() => fileInputRef.current?.click()} data-testid="restore-btn">
-              <Upload size={16} />
-              {sidebarOpen && <span>Restaurar</span>}
-            </Button>
-            <input 
-              ref={fileInputRef}
-              type="file" 
-              accept=".json" 
-              onChange={handleRestore} 
-              style={{ display: 'none' }} 
+          <nav className="nav-menu">
+            <button 
+              className={`nav-item ${currentView === 'dashboard' ? 'active' : ''}`} 
+              onClick={() => setCurrentView('dashboard')}
+              data-testid="nav-dashboard-btn"
+            >
+              <LayoutDashboard size={20} />
+              {sidebarOpen && <span>Dashboard</span>}
+            </button>
+            <button 
+              className={`nav-item ${currentView === 'lancamentos' ? 'active' : ''}`} 
+              onClick={() => setCurrentView('lancamentos')}
+              data-testid="nav-lancamentos-btn"
+            >
+              <Receipt size={20} />
+              {sidebarOpen && <span>Lançamentos</span>}
+            </button>
+            <button 
+              className={`nav-item ${currentView === 'fixos' ? 'active' : ''}`} 
+              onClick={() => setCurrentView('fixos')}
+              data-testid="nav-fixos-btn"
+            >
+              <Repeat size={20} />
+              {sidebarOpen && <span>Fixos</span>}
+            </button>
+            <button 
+              className={`nav-item ${currentView === 'pagamento' ? 'active' : ''}`} 
+              onClick={() => setCurrentView('pagamento')}
+              data-testid="nav-pagamento-btn"
+            >
+              <Zap size={20} />
+              {sidebarOpen && <span>Pag. Inteligente</span>}
+            </button>
+            <button 
+              className={`nav-item ${currentView === 'investimentos' ? 'active' : ''}`} 
+              onClick={() => setCurrentView('investimentos')}
+              data-testid="nav-investimentos-btn"
+            >
+              <TrendingUp size={20} />
+              {sidebarOpen && <span>Investimentos</span>}
+            </button>
+          </nav>
+
+          <div className="sidebar-footer">
+            <div className="filter-section">
+              {sidebarOpen && <Label className="filter-label">Período</Label>}
+              <select 
+                value={periodoTipo} 
+                onChange={(e) => setPeriodoTipo(e.target.value)}
+                className="filter-select"
+                data-testid="periodo-tipo-select"
+              >
+                <option value="mes">Mês</option>
+                <option value="ano">Ano</option>
+                <option value="intervalo">Intervalo</option>
+              </select>
+
+              {periodoTipo === "mes" && (
+                <Input 
+                  type="month" 
+                  value={periodoMes} 
+                  onChange={(e) => setPeriodoMes(e.target.value)}
+                  className="filter-input"
+                  data-testid="periodo-mes-input"
+                />
+              )}
+
+              {periodoTipo === "ano" && (
+                <Input 
+                  type="number" 
+                  value={periodoAno} 
+                  onChange={(e) => setPeriodoAno(e.target.value)}
+                  placeholder="2025"
+                  className="filter-input"
+                  data-testid="periodo-ano-input"
+                />
+              )}
+
+              {periodoTipo === "intervalo" && (
+                <>
+                  <Input 
+                    type="date" 
+                    value={periodoInicio} 
+                    onChange={(e) => setPeriodoInicio(e.target.value)}
+                    placeholder="Início"
+                    className="filter-input"
+                    data-testid="periodo-inicio-input"
+                  />
+                  <Input 
+                    type="date" 
+                    value={periodoFim} 
+                    onChange={(e) => setPeriodoFim(e.target.value)}
+                    placeholder="Fim"
+                    className="filter-input"
+                    data-testid="periodo-fim-input"
+                  />
+                </>
+              )}
+            </div>
+
+            <div className="backup-section">
+              <Button variant="outline" size="sm" onClick={handleBackup} className="backup-btn" data-testid="backup-btn">
+                <Download size={16} />
+                {sidebarOpen && <span>Backup</span>}
+              </Button>
+              <Button variant="outline" size="sm" className="backup-btn" onClick={() => fileInputRef.current?.click()} data-testid="restore-btn">
+                <Upload size={16} />
+                {sidebarOpen && <span>Restaurar</span>}
+              </Button>
+              <input ref={fileInputRef} type="file" accept=".json" onChange={handleRestore} style={{ display: 'none' }} />
+            </div>
+          </div>
+        </aside>
+
+        {/* Main Content */}
+        <main className="main-content">
+          {currentView === "dashboard" && <DashboardView stats={stats} lancamentos={lancamentosFiltrados} />}
+          {currentView === "lancamentos" && (
+            <LancamentosView 
+              lancamentos={lancamentosFiltrados} 
+              onAdd={() => { setEditingItem(null); setShowLancamentoDialog(true); }}
+              onEdit={(item) => { setEditingItem(item); setShowLancamentoDialog(true); }}
+              onDelete={deletarLancamento}
             />
-          </div>
-        </div>
-      </aside>
+          )}
+          {currentView === "fixos" && (
+            <FixosView 
+              fixos={fixos} 
+              onAdd={() => { setEditingItem(null); setShowFixoDialog(true); }}
+              onEdit={(item) => { setEditingItem(item); setShowFixoDialog(true); }}
+              onDelete={deletarFixo}
+            />
+          )}
+          {currentView === "pagamento" && <PagamentoInteligenteView data={pagamentoInteligente} />}
+          {currentView === "investimentos" && (
+            <InvestimentosView 
+              investimentos={investimentosFiltrados}
+              totalInvestido={stats.totalInvestido}
+              saldoPlanejado={pagamentoInteligente.saldoFinal}
+              onAdd={() => { setEditingItem(null); setShowInvestimentoDialog(true); }}
+              onEdit={(item) => { setEditingItem(item); setShowInvestimentoDialog(true); }}
+              onDelete={deletarInvestimento}
+            />
+          )}
+        </main>
 
-      {/* Main Content */}
-      <main className="main-content">
-        {currentView === "dashboard" && <DashboardView stats={stats} lancamentos={lancamentosFiltrados} />}
-        {currentView === "lancamentos" && (
-          <LancamentosView 
-            lancamentos={lancamentosFiltrados} 
-            onAdd={() => { setEditingItem(null); setShowLancamentoDialog(true); }}
-            onEdit={(item) => { setEditingItem(item); setShowLancamentoDialog(true); }}
-            onDelete={deletarLancamento}
+        {/* Dialogs */}
+        {showLancamentoDialog && (
+          <LancamentoDialog 
+            key={editingItem ? `edit-lanc-${editingItem.id}` : 'new-lanc'}
+            open={showLancamentoDialog} 
+            onOpenChange={setShowLancamentoDialog}
+            onSave={salvarLancamento}
+            editingItem={editingItem}
           />
         )}
-        {currentView === "fixos" && (
-          <FixosView 
-            fixos={fixos} 
-            onAdd={() => { setEditingItem(null); setShowFixoDialog(true); }}
-            onEdit={(item) => { setEditingItem(item); setShowFixoDialog(true); }}
-            onDelete={deletarFixo}
+        {showFixoDialog && (
+          <FixoDialog 
+            key={editingItem ? `edit-fixo-${editingItem.id}` : 'new-fixo'}
+            open={showFixoDialog} 
+            onOpenChange={setShowFixoDialog}
+            onSave={salvarFixo}
+            editingItem={editingItem}
           />
         )}
-        {currentView === "pagamento" && <PagamentoInteligenteView data={pagamentoInteligente} />}
-        {currentView === "investimentos" && (
-          <InvestimentosView 
-            investimentos={investimentosFiltrados}
-            totalInvestido={stats.totalInvestido}
-            saldoPlanejado={pagamentoInteligente.saldoFinal}
-            onAdd={() => { setEditingItem(null); setShowInvestimentoDialog(true); }}
-            onEdit={(item) => { setEditingItem(item); setShowInvestimentoDialog(true); }}
-            onDelete={deletarInvestimento}
+        {showInvestimentoDialog && (
+          <InvestimentoDialog 
+            key={editingItem ? `edit-inv-${editingItem.id}` : 'new-inv'}
+            open={showInvestimentoDialog} 
+            onOpenChange={setShowInvestimentoDialog}
+            onSave={salvarInvestimento}
+            editingItem={editingItem}
           />
         )}
-      </main>
-
-      {/* Dialogs */}
-      {showLancamentoDialog && (
-        <LancamentoDialog 
-          key={editingItem ? `edit-lanc-${editingItem.id}` : 'new-lanc'}
-          open={showLancamentoDialog} 
-          onOpenChange={setShowLancamentoDialog}
-          onSave={salvarLancamento}
-          editingItem={editingItem}
-        />
-      )}
-      {showFixoDialog && (
-        <FixoDialog 
-          key={editingItem ? `edit-fixo-${editingItem.id}` : 'new-fixo'}
-          open={showFixoDialog} 
-          onOpenChange={setShowFixoDialog}
-          onSave={salvarFixo}
-          editingItem={editingItem}
-        />
-      )}
-      {showInvestimentoDialog && (
-        <InvestimentoDialog 
-          key={editingItem ? `edit-inv-${editingItem.id}` : 'new-inv'}
-          open={showInvestimentoDialog} 
-          onOpenChange={setShowInvestimentoDialog}
-          onSave={salvarInvestimento}
-          editingItem={editingItem}
-        />
-      )}
       </div>
     </>
   );

@@ -147,14 +147,12 @@ function App() {
       const jaExiste = lancamentos.some(l => 
         l.origem === 'fixo' && 
         l.descricao === fixo.descricao && 
-        l.data.startsWith(mesSelecionado) &&
-        l.userId === currentUser.userId
+        l.data.startsWith(mesSelecionado)
       );
 
       if (!jaExiste) {
         const novoLancamento = {
           id: crypto.randomUUID(),
-          userId: currentUser.userId,
           data: dataLancamento,
           descricao: fixo.descricao,
           categoria: fixo.categoria,

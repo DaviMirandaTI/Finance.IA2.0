@@ -425,7 +425,7 @@ function App() {
               periodoMes={periodoMes}
             />
           )}
-          {currentView === "pagamento" && <PagamentoInteligenteView fixos={fixosUsuario} periodoMes={periodoMes} />}
+          {currentView === "pagamento" && <PagamentoInteligenteView fixos={fixos} periodoMes={periodoMes} />}
           {currentView === "investimentos" && (
             <InvestimentosAvancadoView 
               movimentos={movimentosFiltrados}

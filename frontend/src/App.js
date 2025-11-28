@@ -12,6 +12,21 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { Menu, X, TrendingUp, TrendingDown, Wallet, Target, Download, Upload, LayoutDashboard, Receipt, Repeat, Zap, DollarSign, CreditCard, LogOut } from "lucide-react";
 
+// Import view components
+import DashboardView from "@/components/views/DashboardView";
+import LancamentosView from "@/components/views/LancamentosView";
+import FixosView from "@/components/views/FixosView";
+import CartoesView from "@/components/views/CartoesView";
+import PagamentoInteligenteView from "@/components/views/PagamentoInteligenteView";
+import InvestimentosAvancadoView from "@/components/views/InvestimentosAvancadoView";
+
+// Import dialog components
+import LancamentoDialog from "@/components/dialogs/LancamentoDialog";
+import FixoDialog from "@/components/dialogs/FixoDialog";
+import CartaoDialog from "@/components/dialogs/CartaoDialog";
+import CompraDialog from "@/components/dialogs/CompraDialog";
+import MovimentoDialog from "@/components/dialogs/MovimentoDialog";
+
 function App() {
   // Auth state
   const [isLoggedIn, setIsLoggedIn] = useState(false);

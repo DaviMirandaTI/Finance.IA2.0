@@ -414,8 +414,8 @@ function App() {
           )}
           {currentView === "cartoes" && (
             <CartoesView 
-              cartoes={cartoesUsuario}
-              compras={comprasUsuario}
+              cartoes={cartoes}
+              compras={comprasCartao}
               onAddCartao={() => { setEditingItem(null); setShowCartaoDialog(true); }}
               onEditCartao={(item) => { setEditingItem(item); setShowCartaoDialog(true); }}
               onDeleteCartao={(id) => setCartoes(prev => prev.filter(c => c.id !== id))}

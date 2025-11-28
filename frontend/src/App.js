@@ -173,7 +173,7 @@ function App() {
         setLancamentos(prev => [...prev, novoLancamento]);
       }
     });
-  };
+  }, [fixos, lancamentos, setLancamentos]);
 
   // Auto-generate lancamentos from fixos
   useEffect(() => {

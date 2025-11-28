@@ -122,10 +122,10 @@ function App() {
 
   // Auto-generate lancamentos from fixos
   useEffect(() => {
-    if (isLoggedIn && currentUser && periodoTipo === "mes" && periodoMes) {
+    if (periodoTipo === "mes" && periodoMes) {
       gerarLancamentosDoMes(periodoMes);
     }
-  }, [fixos, periodoMes, periodoTipo, isLoggedIn, currentUser]);
+  }, [fixos, periodoMes, periodoTipo]);
 
   const gerarLancamentosDoMes = (mesSelecionado) => {
     if (!currentUser) return;

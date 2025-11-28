@@ -128,11 +128,9 @@ function App() {
   }, [fixos, periodoMes, periodoTipo]);
 
   const gerarLancamentosDoMes = (mesSelecionado) => {
-    if (!currentUser) return;
-    
     const [ano, mes] = mesSelecionado.split('-').map(Number);
     const fixosAtivos = fixos.filter(f => {
-      if (!f.ativo || f.userId !== currentUser.userId) return false;
+      if (!f.ativo) return false;
       const [anoInicio, mesInicio] = f.mesInicio.split('-').map(Number);
       if (ano < anoInicio || (ano === anoInicio && mes < mesInicio)) return false;
       if (f.mesFim) {

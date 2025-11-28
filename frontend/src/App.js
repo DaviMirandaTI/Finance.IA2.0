@@ -135,13 +135,6 @@ function App() {
     localStorage.setItem('fs_precos_ativos', JSON.stringify(precosAtivos));
   }, [precosAtivos]);
 
-  // Auto-generate lancamentos from fixos
-  useEffect(() => {
-    if (periodoTipo === "mes" && periodoMes) {
-      gerarLancamentosDoMes(periodoMes);
-    }
-  }, [fixos, periodoMes, periodoTipo]);
-
   const gerarLancamentosDoMes = (mesSelecionado) => {
     const [ano, mes] = mesSelecionado.split('-').map(Number);
     const fixosAtivos = fixos.filter(f => {

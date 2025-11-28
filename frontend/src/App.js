@@ -135,7 +135,7 @@ function App() {
     localStorage.setItem('fs_precos_ativos', JSON.stringify(precosAtivos));
   }, [precosAtivos]);
 
-  const gerarLancamentosDoMes = (mesSelecionado) => {
+  const gerarLancamentosDoMes = useCallback((mesSelecionado) => {
     const [ano, mes] = mesSelecionado.split('-').map(Number);
     const fixosAtivos = fixos.filter(f => {
       if (!f.ativo) return false;

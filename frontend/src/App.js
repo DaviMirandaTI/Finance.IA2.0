@@ -40,13 +40,26 @@ function App() {
 
   // Load data from localStorage
   useEffect(() => {
+    console.log('🔄 Carregando dados do localStorage...');
     const savedLancamentos = localStorage.getItem('fs_lancamentos');
     const savedFixos = localStorage.getItem('fs_fixos');
     const savedInvestimentos = localStorage.getItem('fs_investimentos');
     
-    if (savedLancamentos) setLancamentos(JSON.parse(savedLancamentos));
-    if (savedFixos) setFixos(JSON.parse(savedFixos));
-    if (savedInvestimentos) setInvestimentos(JSON.parse(savedInvestimentos));
+    if (savedLancamentos) {
+      const parsed = JSON.parse(savedLancamentos);
+      console.log('✅ Lançamentos carregados:', parsed.length);
+      setLancamentos(parsed);
+    }
+    if (savedFixos) {
+      const parsed = JSON.parse(savedFixos);
+      console.log('✅ Fixos carregados:', parsed.length);
+      setFixos(parsed);
+    }
+    if (savedInvestimentos) {
+      const parsed = JSON.parse(savedInvestimentos);
+      console.log('✅ Investimentos carregados:', parsed.length);
+      setInvestimentos(parsed);
+    }
   }, []);
 
   // Save data to localStorage

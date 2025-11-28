@@ -137,18 +137,35 @@ function App() {
     });
   }, [investimentos, periodoTipo, periodoMes, periodoAno, periodoInicio, periodoFim]);
 
-  // Calculate dashboard stats
+  // Calculate dashboard stats - ALWAYS recalculate
   const stats = useMemo(() => {
-    const renda = lancamentosFiltrados.filter(l => l.tipo === 'entrada').reduce((sum, l) => sum + l.valor, 0);
-    const despesas = lancamentosFiltrados.filter(l => l.tipo === 'saida').reduce((sum, l) => sum + l.valor, 0);
+    console.log('Recalculando stats...', { 
+      lancamentos: lancamentosFiltrados.length, 
+      investimentos: investimentosFiltrados.length 
+    });
+    
+    const renda = lancamentosFiltrados
+      .filter(l => l.tipo === 'entrada')
+      .reduce((sum, l) => sum + (Number(l.valor) || 0), 0);
+    
+    const despesas = lancamentosFiltrados
+      .filter(l => l.tipo === 'saida')
+      .reduce((sum, l) => sum + (Number(l.valor) || 0), 0);
+    
     const resultado = renda - despesas;
-    const totalInvestido = investimentosFiltrados.reduce((sum, inv) => sum + inv.valor, 0);
+    
+    const totalInvestido = investimentosFiltrados
+      .reduce((sum, inv) => sum + (Number(inv.valor) || 0), 0);
     
     const categorias = {};
-    lancamentosFiltrados.filter(l => l.tipo === 'saida').forEach(l => {
-      categorias[l.categoria] = (categorias[l.categoria] || 0) + l.valor;
-    });
+    lancamentosFiltrados
+      .filter(l => l.tipo === 'saida')
+      .forEach(l => {
+        categorias[l.categoria] = (categorias[l.categoria] || 0) + (Number(l.valor) || 0);
+      });
 
+    console.log('Stats calculados:', { renda, despesas, resultado, totalInvestido });
+    
     return { renda, despesas, resultado, totalInvestido, categorias };
   }, [lancamentosFiltrados, investimentosFiltrados]);
 

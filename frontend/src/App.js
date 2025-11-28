@@ -175,6 +175,13 @@ function App() {
     });
   };
 
+  // Auto-generate lancamentos from fixos
+  useEffect(() => {
+    if (periodoTipo === "mes" && periodoMes) {
+      gerarLancamentosDoMes(periodoMes);
+    }
+  }, [fixos, periodoMes, periodoTipo, gerarLancamentosDoMes]);
+
   // Direct data access (no user filtering in v1.0)
 
   // Filter by period

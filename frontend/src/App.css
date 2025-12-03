@@ -577,6 +577,7 @@ select option {
   
   .main-content {
     padding: 1rem;
+    padding-top: 5rem; /* Add space for the fixed menu button */
   }
   
   .view-title {

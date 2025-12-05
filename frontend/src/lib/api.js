@@ -2,21 +2,53 @@
 // senão, usa o endereço local do backend para desenvolvimento.
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
-// Função genérica para chamadas fetch
+// Função para obter token do localStorage
+const getAuthToken = () => {
+  return localStorage.getItem('auth_token');
+};
+
+// Função genérica para chamadas fetch com interceptors
 const fetchApi = async (url, options = {}) => {
   try {
+    const token = getAuthToken();
+    
+    // Headers padrão
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    // Adiciona token de autenticação se existir
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...options.headers,
-      },
+      headers,
     });
 
+    // Se receber 401 (não autorizado), remove token e redireciona
+    if (response.status === 401) {
+      localStorage.removeItem('auth_token');
+      // Dispara evento customizado para o AuthContext reagir
+      window.dispatchEvent(new CustomEvent('auth:unauthorized'));
+      throw new Error('Sessão expirada. Faça login novamente.');
+    }
+
     if (!response.ok) {
-      const errorBody = await response.text();
+      let errorBody;
+      try {
+        errorBody = await response.json();
+      } catch {
+        errorBody = await response.text();
+      }
       console.error('Falha na chamada da API:', response.status, errorBody);
-      throw new Error(`Erro na API: ${response.statusText}`);
+      
+      // Cria erro com mais informações
+      const error = new Error(errorBody.detail || errorBody.message || `Erro na API: ${response.statusText}`);
+      error.response = { status: response.status, data: errorBody };
+      throw error;
     }
 
     // Retorna null para respostas 204 No Content (comuns em DELETE)
@@ -27,9 +59,50 @@ const fetchApi = async (url, options = {}) => {
     return response.json();
   } catch (error) {
     console.error("Erro de conexão com a API:", error);
-    // Você pode usar 'sonner' ou 'toast' aqui se quiser mostrar um erro global
     throw error;
   }
+};
+
+// Função para login (usa form-data para OAuth2)
+export const login = async (email, password) => {
+  const formData = new URLSearchParams();
+  formData.append('username', email); // OAuth2 usa 'username' para email
+  formData.append('password', password);
+
+  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: formData.toString(),
+  });
+
+  if (!response.ok) {
+    let errorBody;
+    try {
+      errorBody = await response.json();
+    } catch {
+      errorBody = await response.text();
+    }
+    const error = new Error(errorBody.detail || 'Erro ao fazer login');
+    error.response = { status: response.status, data: errorBody };
+    throw error;
+  }
+
+  return response.json();
+};
+
+// Função para registro
+export const register = async (userData) => {
+  return fetchApi(`${API_BASE_URL}/api/auth/register`, {
+    method: 'POST',
+    body: JSON.stringify(userData),
+  });
+};
+
+// Função para obter usuário atual
+export const getCurrentUser = async () => {
+  return fetchApi(`${API_BASE_URL}/api/auth/me`);
 };
 
 // --- Lancamentos ---

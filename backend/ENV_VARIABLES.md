@@ -44,3 +44,4 @@ SECRET_KEY=sua-chave-secreta-super-segura-aqui-min-32-chars
 ACCESS_TOKEN_EXPIRE_MINUTES=1440
 ```
 
+

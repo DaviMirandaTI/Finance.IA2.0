@@ -9,6 +9,7 @@ class UserCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
     
     nome: str = Field(..., min_length=2, max_length=100, description="Nome completo do usuário")
+    username: str = Field(..., min_length=3, max_length=50, description="Nome de usuário único")
     email: EmailStr = Field(..., description="Email único do usuário")
     senha: str = Field(..., min_length=6, max_length=100, description="Senha do usuário (mínimo 6 caracteres)")
     telefone: Optional[str] = Field(None, max_length=20, description="Telefone do usuário")
@@ -20,6 +21,7 @@ class UserUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid")
     
     nome: Optional[str] = Field(None, min_length=2, max_length=100)
+    username: Optional[str] = Field(None, min_length=3, max_length=50)
     telefone: Optional[str] = Field(None, max_length=20)
     foto_url: Optional[str] = Field(None, max_length=500)
 
@@ -30,6 +32,7 @@ class UserDB(BaseModel):
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), alias="_id")
     nome: str
+    username: str
     email: str
     senha_hash: str  # Senha já com hash
     telefone: Optional[str] = None
@@ -46,6 +49,7 @@ class UserResponse(BaseModel):
     
     id: str
     nome: str
+    username: str
     email: str
     telefone: Optional[str] = None
     foto_url: Optional[str] = None

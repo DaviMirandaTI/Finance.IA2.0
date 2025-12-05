@@ -5,13 +5,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet, Mail, Lock, User, Phone, Loader2 } from 'lucide-react';
+import { Wallet, Mail, Lock, User, Phone, Loader2, AtSign } from 'lucide-react';
 
 export default function Register() {
   const navigate = useNavigate();
   const { register, loading } = useAuth();
   const [formData, setFormData] = useState({
     nome: '',
+    username: '',
     email: '',
     senha: '',
     telefone: '',
@@ -83,6 +84,29 @@ export default function Register() {
                   }}
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-gray-300">Nome de usuário</Label>
+              <div className="relative">
+                <AtSign className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                <Input
+                  id="username"
+                  type="text"
+                  placeholder="stark, luan, etc."
+                  value={formData.username}
+                  onChange={(e) => setFormData({ ...formData, username: e.target.value.toLowerCase().replace(/\s+/g, '') })}
+                  required
+                  minLength={3}
+                  className="pl-10"
+                  style={{
+                    background: 'rgba(10, 25, 41, 0.6)',
+                    border: '1px solid rgba(16, 185, 129, 0.2)',
+                    color: '#e0e7ff',
+                  }}
+                />
+              </div>
+              <p className="text-xs text-gray-500">Mínimo 3 caracteres, sem espaços</p>
             </div>
 
             <div className="space-y-2">
@@ -186,4 +210,5 @@ export default function Register() {
     </div>
   );
 }
+
 

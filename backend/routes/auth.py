@@ -5,9 +5,9 @@ from datetime import datetime, timezone
 import uuid
 import logging
 
-from ..models.user import UserCreate, UserDB, UserResponse, Token
-from ..auth.security import get_password_hash, verify_password, create_access_token, decode_access_token
-from ..server import db  # Importa a conexão do MongoDB do server.py
+from models.user import UserCreate, UserDB, UserResponse, Token
+from auth.security import get_password_hash, verify_password, create_access_token, decode_access_token
+from server import db  # Importa a conexão do MongoDB do server.py
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +30,14 @@ async def get_user_by_email(email: str) -> Optional[dict]:
     """
     user = await db.users.find_one({"email": email.lower()})
     if user:
-        user["_id"] = str(user["_id"])
+        # Garante que o campo "id" existe (pode ser _id ou id)
+        if "_id" in user:
+            if "id" not in user:
+                user["id"] = str(user["_id"])
+            user["_id"] = str(user["_id"])
+        elif "id" not in user:
+            # Se não tem nem _id nem id, cria um id baseado no _id
+            user["id"] = str(user.get("_id", ""))
     return user
 
 
@@ -44,9 +51,23 @@ async def get_user_by_id(user_id: str) -> Optional[dict]:
     Returns:
         Documento do usuário ou None se não encontrado
     """
+    # Tenta buscar por "id" primeiro, depois por "_id"
     user = await db.users.find_one({"id": user_id})
+    if not user:
+        # Se não encontrar por "id", tenta por "_id" (ObjectId)
+        try:
+            from bson import ObjectId
+            user = await db.users.find_one({"_id": ObjectId(user_id)})
+        except:
+            pass
+    
     if user:
-        user["_id"] = str(user["_id"])
+        # Garante que o campo "id" existe (pode ser _id ou id)
+        if "_id" in user:
+            user["id"] = str(user["_id"])
+            user["_id"] = str(user["_id"])
+        elif "id" not in user:
+            user["id"] = str(user.get("_id", user_id))
     return user
 
 
@@ -129,10 +150,20 @@ async def register(user_data: UserCreate):
             detail="Email já cadastrado"
         )
     
+    # Verifica se username já existe
+    existing_username = await db.users.find_one({"username": user_data.username.lower()})
+    if existing_username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Nome de usuário já cadastrado"
+        )
+    
     # Cria documento do usuário
+    user_id = str(uuid.uuid4())
     user_dict = {
-        "id": str(uuid.uuid4()),
+        "id": user_id,
         "nome": user_data.nome,
+        "username": user_data.username.lower(),
         "email": email_lower,
         "senha_hash": get_password_hash(user_data.senha),
         "telefone": user_data.telefone,
@@ -145,8 +176,10 @@ async def register(user_data: UserCreate):
     
     # Insere no MongoDB
     try:
-        await db.users.insert_one(user_dict)
-        logger.info(f"Novo usuário registrado: {email_lower}")
+        result = await db.users.insert_one(user_dict)
+        # Garante que o _id do MongoDB também está no documento
+        user_dict["_id"] = str(result.inserted_id)
+        logger.info(f"Novo usuário registrado: {email_lower} (ID: {user_id})")
     except Exception as e:
         logger.error(f"Erro ao registrar usuário: {e}")
         raise HTTPException(

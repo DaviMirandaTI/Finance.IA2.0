@@ -1,6 +1,12 @@
-// Define a URL base da API. Usa a variável de ambiente se estiver disponível (em produção),
-// senão, usa o endereço local do backend para desenvolvimento.
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+// Define a URL base da API.
+// - Usa REACT_APP_API_URL se estiver configurada
+// - Em dev (localhost) usa http://localhost:8000
+// - Em produção (sem env) faz fallback para o backend no Render
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL ||
+  (typeof window !== 'undefined' && window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : 'https://financeia20-backend.onrender.com');
 
 // Função para obter token do localStorage
 const getAuthToken = () => {
@@ -69,7 +75,7 @@ export const login = async (email, password) => {
   formData.append('username', email); // OAuth2 usa 'username' para email
   formData.append('password', password);
 
-  const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+  const response = await fetch(`${API_BASE_URL}/auth/login`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -94,7 +100,7 @@ export const login = async (email, password) => {
 
 // Função para registro
 export const register = async (userData) => {
-  return fetchApi(`${API_BASE_URL}/api/auth/register`, {
+  return fetchApi(`${API_BASE_URL}/auth/register`, {
     method: 'POST',
     body: JSON.stringify(userData),
   });
@@ -102,7 +108,7 @@ export const register = async (userData) => {
 
 // Função para obter usuário atual
 export const getCurrentUser = async () => {
-  return fetchApi(`${API_BASE_URL}/api/auth/me`);
+  return fetchApi(`${API_BASE_URL}/auth/me`);
 };
 
 // --- Lancamentos ---

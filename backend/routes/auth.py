@@ -14,8 +14,9 @@ logger = logging.getLogger(__name__)
 # Router para autenticação
 auth_router = APIRouter(prefix="/auth", tags=["autenticação"])
 
-# OAuth2 scheme para login
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+# OAuth2 scheme para login (Swagger Authorize)
+# Importante: usar o caminho real da rota (/auth/login) sem o prefixo /api
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 async def get_user_by_email(email: str) -> Optional[dict]:

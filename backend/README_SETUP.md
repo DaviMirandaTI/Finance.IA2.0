@@ -81,3 +81,5 @@ rm backend/setup_inicial.py
 
 ⚠️ **Altere a senha padrão** após o primeiro login!
 
+
+

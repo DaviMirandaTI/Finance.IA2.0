@@ -146,3 +146,5 @@ async def run_setup(request: Request):
             detail="Erro ao executar setup",
         )
 
+
+

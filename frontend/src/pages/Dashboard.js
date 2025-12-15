@@ -509,6 +509,106 @@ export default function Dashboard() {
                   </button>
                 </nav>
       
+                {/* Ações Rápidas no Sidebar */}
+                <div className="quick-actions-sidebar" style={{
+                  padding: sidebarOpen ? '0.75rem' : '0.5rem',
+                  borderTop: '1px solid rgba(16, 185, 129, 0.1)',
+                  borderBottom: '1px solid rgba(16, 185, 129, 0.1)',
+                }}>
+                  {sidebarOpen && (
+                    <Label className="filter-label" style={{ marginBottom: '0.5rem', fontSize: '0.75rem' }}>Ações Rápidas</Label>
+                  )}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <Button
+                      onClick={() => {
+                        setEditingItem(null);
+                        setShowLancamentoDialog(true);
+                        setTimeout(() => {
+                          const event = new CustomEvent('quick-action', { detail: { tipo: 'entrada', forma: 'pix' } });
+                          window.dispatchEvent(event);
+                        }, 100);
+                      }}
+                      size="sm"
+                      className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'} text-xs`}
+                      title="Pix Recebido"
+                      style={{
+                        background: 'rgba(16, 185, 129, 0.2)',
+                        border: '1px solid rgba(16, 185, 129, 0.4)',
+                        color: '#10b981',
+                      }}
+                    >
+                      <Plus size={14} className={sidebarOpen ? "mr-2" : ""} />
+                      {sidebarOpen && "Pix Recebido"}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setEditingItem(null);
+                        setShowLancamentoDialog(true);
+                        setTimeout(() => {
+                          const event = new CustomEvent('quick-action', { detail: { tipo: 'saida', forma: 'debito' } });
+                          window.dispatchEvent(event);
+                        }, 100);
+                      }}
+                      size="sm"
+                      className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'} text-xs`}
+                      title="Compra no Débito"
+                      style={{
+                        background: 'rgba(239, 68, 68, 0.2)',
+                        border: '1px solid rgba(239, 68, 68, 0.4)',
+                        color: '#ef4444',
+                      }}
+                    >
+                      <Plus size={14} className={sidebarOpen ? "mr-2" : ""} />
+                      {sidebarOpen && "Compra no Débito"}
+                    </Button>
+                    <Button
+                      onClick={() => {
+                        setEditingItem(null);
+                        setShowFixoDialog(true);
+                      }}
+                      size="sm"
+                      className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'} text-xs`}
+                      title="Conta Fixa"
+                      style={{
+                        background: 'rgba(34, 211, 238, 0.2)',
+                        border: '1px solid rgba(34, 211, 238, 0.4)',
+                        color: '#22d3ee',
+                      }}
+                    >
+                      <Plus size={14} className={sidebarOpen ? "mr-2" : ""} />
+                      {sidebarOpen && "Conta Fixa"}
+                    </Button>
+                    <Button
+                      onClick={() => navigate('/importar-extratos')}
+                      size="sm"
+                      className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'} text-xs`}
+                      title="Importar Extrato"
+                      style={{
+                        background: 'rgba(59, 130, 246, 0.2)',
+                        border: '1px solid rgba(59, 130, 246, 0.4)',
+                        color: '#60a5fa',
+                      }}
+                    >
+                      <Upload size={14} className={sidebarOpen ? "mr-2" : ""} />
+                      {sidebarOpen && "Importar Extrato"}
+                    </Button>
+                    <Button
+                      onClick={() => setShowGlobalSearch(true)}
+                      variant="outline"
+                      size="sm"
+                      className={`w-full ${sidebarOpen ? 'justify-start' : 'justify-center'} text-xs`}
+                      title="Buscar (Ctrl+K)"
+                      style={{
+                        border: '1px solid rgba(148, 163, 184, 0.3)',
+                        color: '#94a3b8',
+                      }}
+                    >
+                      <Search size={14} className={sidebarOpen ? "mr-2" : ""} />
+                      {sidebarOpen && "Buscar (Ctrl+K)"}
+                    </Button>
+                  </div>
+                </div>
+      
                 <div className="sidebar-footer">
                   {/* User Info */}
                   {sidebarOpen && user && (
@@ -615,107 +715,6 @@ export default function Dashboard() {
               <button className="menu-toggle" onClick={() => setSidebarOpen(!sidebarOpen)} data-testid="menu-toggle-btn">
                 {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
               </button>
-      
-              {/* Barra de Atalhos Rápidos e Busca */}
-              <div className="quick-actions-bar" style={{
-                padding: '0.75rem',
-                background: 'rgba(15, 23, 42, 0.8)',
-                borderBottom: '1px solid rgba(34, 211, 238, 0.2)',
-                display: 'flex',
-                gap: '0.5rem',
-                alignItems: 'center',
-                flexWrap: 'wrap',
-                overflowX: 'auto',
-              }}>
-                <Button
-                  onClick={() => {
-                    setEditingItem(null);
-                    setShowLancamentoDialog(true);
-                    setTimeout(() => {
-                      const event = new CustomEvent('quick-action', { detail: { tipo: 'entrada', forma: 'pix' } });
-                      window.dispatchEvent(event);
-                    }, 100);
-                  }}
-                  size="sm"
-                  className="text-xs sm:text-sm whitespace-nowrap"
-                  style={{
-                    background: 'rgba(16, 185, 129, 0.2)',
-                    border: '1px solid rgba(16, 185, 129, 0.4)',
-                    color: '#10b981',
-                  }}
-                >
-                  <Plus size={14} className="mr-1" />
-                  <span className="hidden sm:inline">Pix Recebido</span>
-                  <span className="sm:hidden">Pix</span>
-                </Button>
-                <Button
-                  onClick={() => {
-                    setEditingItem(null);
-                    setShowLancamentoDialog(true);
-                    setTimeout(() => {
-                      const event = new CustomEvent('quick-action', { detail: { tipo: 'saida', forma: 'debito' } });
-                      window.dispatchEvent(event);
-                    }, 100);
-                  }}
-                  size="sm"
-                  className="text-xs sm:text-sm whitespace-nowrap"
-                  style={{
-                    background: 'rgba(239, 68, 68, 0.2)',
-                    border: '1px solid rgba(239, 68, 68, 0.4)',
-                    color: '#ef4444',
-                  }}
-                >
-                  <Plus size={14} className="mr-1" />
-                  <span className="hidden sm:inline">Compra no Débito</span>
-                  <span className="sm:hidden">Débito</span>
-                </Button>
-                <Button
-                  onClick={() => {
-                    setEditingItem(null);
-                    setShowFixoDialog(true);
-                  }}
-                  size="sm"
-                  className="text-xs sm:text-sm whitespace-nowrap"
-                  style={{
-                    background: 'rgba(34, 211, 238, 0.2)',
-                    border: '1px solid rgba(34, 211, 238, 0.4)',
-                    color: '#22d3ee',
-                  }}
-                >
-                  <Plus size={14} className="mr-1" />
-                  <span className="hidden sm:inline">Conta Fixa</span>
-                  <span className="sm:hidden">Fixo</span>
-                </Button>
-                <Button
-                  onClick={() => navigate('/importar-extratos')}
-                  size="sm"
-                  className="text-xs sm:text-sm whitespace-nowrap"
-                  style={{
-                    background: 'rgba(59, 130, 246, 0.2)',
-                    border: '1px solid rgba(59, 130, 246, 0.4)',
-                    color: '#60a5fa',
-                  }}
-                >
-                  <Upload size={14} className="mr-1" />
-                  <span className="hidden sm:inline">Importar Extrato</span>
-                  <span className="sm:hidden">Importar</span>
-                </Button>
-                <div className="hidden sm:block" style={{ flex: 1 }} />
-                <Button
-                  onClick={() => setShowGlobalSearch(true)}
-                  variant="outline"
-                  size="sm"
-                  className="text-xs sm:text-sm whitespace-nowrap"
-                  style={{
-                    border: '1px solid rgba(148, 163, 184, 0.3)',
-                    color: '#94a3b8',
-                  }}
-                >
-                  <Search size={14} className="mr-1 sm:mr-2" />
-                  <span className="hidden sm:inline">Buscar</span>
-                  <span className="hidden lg:inline ml-2 text-xs opacity-60">Ctrl+K</span>
-                </Button>
-              </div>
       
               {/* Main Content */}
               <main className="main-content">

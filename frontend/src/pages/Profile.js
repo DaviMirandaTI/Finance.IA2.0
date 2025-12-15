@@ -4,8 +4,7 @@ import { toast } from 'sonner';
 import {
   updateProfile,
   changePassword,
-  requestVerifyEmail,
-  verifyEmail,
+  uploadImage,
 } from '../lib/api';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -26,11 +25,9 @@ export default function Profile() {
     nova_senha: '',
     confirmacao: '',
   });
-  const [verifyToken, setVerifyToken] = useState('');
   const [loading, setLoading] = useState(false);
   const [loadingPwd, setLoadingPwd] = useState(false);
-  const [loadingVerify, setLoadingVerify] = useState(false);
-  const [generatedToken, setGeneratedToken] = useState('');
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -63,6 +60,26 @@ export default function Profile() {
     }
   };
 
+  const handleUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const res = await uploadImage(file);
+      if (res?.url) {
+        setForm((prev) => ({ ...prev, foto_url: res.url }));
+        toast.success('Foto enviada!');
+      } else {
+        toast.error('Falha ao enviar imagem.');
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.detail || error.message || 'Erro ao enviar imagem');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleChangePassword = async (e) => {
     e.preventDefault();
     if (pwdForm.nova_senha !== pwdForm.confirmacao) {
@@ -82,39 +99,6 @@ export default function Profile() {
     }
   };
 
-  const handleRequestVerify = async () => {
-    setLoadingVerify(true);
-    try {
-      const res = await requestVerifyEmail();
-      setGeneratedToken(res.token || '');
-      toast.success('Token de verificação gerado (para testes).');
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.detail || error.message || 'Erro ao gerar token');
-    } finally {
-      setLoadingVerify(false);
-    }
-  };
-
-  const handleVerifyEmail = async () => {
-    if (!verifyToken) {
-      toast.error('Informe o token.');
-      return;
-    }
-    setLoadingVerify(true);
-    try {
-      await verifyEmail(verifyToken);
-      const updated = { ...user, email_verified: true };
-      updateUser(updated);
-      toast.success('Email verificado!');
-      setVerifyToken('');
-    } catch (error) {
-      console.error(error);
-      toast.error(error.response?.data?.detail || error.message || 'Erro ao verificar email');
-    } finally {
-      setLoadingVerify(false);
-    }
-  };
 
   if (!user) {
     return <div className="p-4 text-center text-sm text-gray-300">Carregando perfil...</div>;
@@ -151,6 +135,13 @@ export default function Profile() {
               <div>
                 <Label>Foto URL</Label>
                 <Input value={form.foto_url} onChange={(e) => handleChange('foto_url', e.target.value)} />
+                <div className="mt-2 flex flex-col gap-2">
+                  <Input type="file" accept="image/*" onChange={handleUpload} />
+                  {uploading && <p className="text-xs text-gray-400">Enviando imagem...</p>}
+                  {form.foto_url && (
+                    <img src={form.foto_url} alt="avatar" className="h-16 w-16 rounded-full object-cover" />
+                  )}
+                </div>
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? 'Salvando...' : 'Salvar alterações'}
@@ -184,30 +175,6 @@ export default function Profile() {
           </CardContent>
         </Card>
 
-        <Card className="backdrop-blur border border-[rgba(16,185,129,0.2)] md:col-span-2" style={{ background: 'rgba(15, 34, 57, 0.8)' }}>
-          <CardHeader>
-            <CardTitle>Verificação de Email</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex flex-wrap gap-2">
-              <Button onClick={handleRequestVerify} disabled={loadingVerify || user.email_verified}>
-                {user.email_verified ? 'Email já verificado' : 'Gerar token de verificação'}
-              </Button>
-              {generatedToken && (
-                <span className="text-xs text-gray-300 break-all">
-                  Token gerado (para testes): {generatedToken}
-                </span>
-              )}
-            </div>
-            <div className="flex flex-col gap-2">
-              <Label>Token</Label>
-              <Input value={verifyToken} onChange={(e) => setVerifyToken(e.target.value)} placeholder="Cole o token aqui" />
-              <Button onClick={handleVerifyEmail} disabled={loadingVerify || user.email_verified}>
-                Verificar email
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );

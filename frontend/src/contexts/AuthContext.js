@@ -14,8 +14,8 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true); // app liberado
 
   // Verifica se existe token no localStorage
   const getToken = () => {
@@ -124,20 +124,9 @@ export const AuthProvider = ({ children }) => {
 
   // Valida token ao carregar a aplicação
   useEffect(() => {
-    validateToken();
-    
-    // Listener para eventos de não autorizado (401)
-    const handleUnauthorized = () => {
-      removeToken();
-      setUser(null);
-      setIsAuthenticated(false);
-    };
-    
-    window.addEventListener('auth:unauthorized', handleUnauthorized);
-    
-    return () => {
-      window.removeEventListener('auth:unauthorized', handleUnauthorized);
-    };
+    // app liberado: não exige token
+    setLoading(false);
+    setIsAuthenticated(true);
   }, []);
 
   const value = {

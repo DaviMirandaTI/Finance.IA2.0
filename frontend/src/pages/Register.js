@@ -23,14 +23,19 @@ export default function Register() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const result = await register(formData);
-    
-    if (result.success) {
-      // Redireciona para login após registro bem-sucedido
-      navigate('/login');
+    try {
+      const result = await register(formData);
+      
+      if (result.success) {
+        // Redireciona para login após registro bem-sucedido
+        navigate('/login');
+      }
+    } catch (error) {
+      // Já tratado no contexto com toast, aqui só garantimos não travar
+      console.error('Erro no registro:', error);
+    } finally {
+      setIsSubmitting(false);
     }
-    
-    setIsSubmitting(false);
   };
 
   return (

@@ -20,6 +20,7 @@ from models.user import (
 from auth.security import get_password_hash, verify_password, create_access_token, decode_access_token
 from server import db  # Importa a conexão do MongoDB do server.py
 from datetime import timedelta
+from utils.email import send_verification_email, send_reset_email
 
 logger = logging.getLogger(__name__)
 
@@ -206,7 +207,7 @@ async def register(user_data: UserCreate):
         "senha_hash": get_password_hash(user_data.senha),
         "telefone": user_data.telefone,
         "foto_url": user_data.foto_url,
-        "email_verified": False,
+        "email_verified": True,  # confirmação desativada por enquanto
         "workspace_id": None,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "updated_at": datetime.now(timezone.utc).isoformat()
@@ -281,38 +282,14 @@ async def get_current_user_info(current_user: dict = Depends(get_current_user)):
 @auth_router.post("/request-verify-email", response_model=RequestVerifyEmailResponse)
 async def request_verify_email(current_user: dict = Depends(get_current_user)):
     """
-    Gera token de verificação de email e retorna (para fins de debug/dev).
-    Em produção, esse token deveria ser enviado por email.
+    Verificação de email desativada temporariamente.
     """
-    if current_user.get("email_verified"):
-        raise HTTPException(status_code=400, detail="Email já verificado")
-
-    token = await create_token_record("verification_tokens", current_user["id"], ttl_minutes=60 * 24)
-    logger.info(f"Token de verificação gerado para {current_user['email']}")
-    return RequestVerifyEmailResponse(token=token)
+    return RequestVerifyEmailResponse(token="")
 
 
 @auth_router.post("/verify-email")
 async def verify_email(payload: VerifyEmailRequest):
-    token_doc = await get_token_record("verification_tokens", payload.token)
-    if not token_doc:
-        raise HTTPException(status_code=400, detail="Token inválido")
-
-    if token_doc.get("used"):
-        raise HTTPException(status_code=400, detail="Token já utilizado")
-
-    expires_at = datetime.fromisoformat(token_doc["expires_at"])
-    if datetime.now(timezone.utc) > expires_at:
-        raise HTTPException(status_code=400, detail="Token expirado")
-
-    user = await get_user_by_id(token_doc["user_id"])
-    if not user:
-        raise HTTPException(status_code=404, detail="Usuário não encontrado")
-
-    await db.users.update_one({"id": user["id"]}, {"$set": {"email_verified": True}})
-    await invalidate_token("verification_tokens", payload.token)
-
-    return {"detail": "Email verificado com sucesso"}
+    return {"detail": "Verificação desativada temporariamente"}
 
 
 # ---------------------------
@@ -323,14 +300,17 @@ async def verify_email(payload: VerifyEmailRequest):
 @auth_router.post("/request-reset-password")
 async def request_reset_password(payload: RequestResetPassword):
     """
-    Gera token de reset de senha. Em produção, deve ser enviado por email.
-    Retornamos o token para facilitar testes.
+    Gera token de reset de senha. Em produção, envia por email.
+    Retorna o token apenas se o envio não estiver configurado (para dev/teste).
     """
     user = await get_user_by_email(payload.email)
     token = None
     if user:
         token = await create_token_record("reset_tokens", user["id"], ttl_minutes=60)
-        logger.info(f"Token de reset gerado para {payload.email}")
+        sent = send_reset_email(payload.email, token)
+        logger.info(f"Token de reset gerado para {payload.email} (enviado={sent})")
+        if sent:
+            token = ""  # ocultamos se enviado
     # Sempre responde 200 para não vazar existência de email
     return {"detail": "Se o email existir, o token foi gerado.", "token": token}
 
@@ -400,7 +380,7 @@ async def update_profile(payload: UpdateProfilePayload, current_user: dict = Dep
         if existing_email:
             raise HTTPException(status_code=400, detail="Email já cadastrado")
         updates["email"] = payload.email.lower()
-        updates["email_verified"] = False  # precisa reverificar
+        # confirmação desativada por enquanto; mantemos email_verified como estava
     if payload.telefone is not None:
         updates["telefone"] = payload.telefone
     if payload.foto_url is not None:

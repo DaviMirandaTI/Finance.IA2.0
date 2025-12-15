@@ -20,9 +20,13 @@ const fetchApi = async (url, options = {}) => {
     
     // Headers padrão
     const headers = {
-      'Content-Type': 'application/json',
       ...options.headers,
     };
+
+    // Define Content-Type padrão se não for FormData
+    if (!(options.body instanceof FormData)) {
+      headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+    }
 
     // Adiciona token de autenticação se existir
     if (token) {
@@ -145,3 +149,10 @@ export const changePassword = (senha_atual, nova_senha) =>
 
 export const updateProfile = (payload) =>
   fetchApi(`${API_BASE_URL}/auth/profile`, { method: 'PUT', body: JSON.stringify(payload) });
+
+// Upload
+export const uploadImage = (file) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  return fetchApi(`${API_BASE_URL}/upload/image`, { method: 'POST', body: formData });
+};

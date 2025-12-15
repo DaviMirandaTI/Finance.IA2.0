@@ -172,6 +172,10 @@ app.include_router(auth_router)
 from routes.setup_run import setup_router
 app.include_router(setup_router)
 
+# Router de upload
+from routes.upload import upload_router
+app.include_router(upload_router)
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,

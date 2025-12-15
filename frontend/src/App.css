@@ -291,6 +291,9 @@ body {
   margin-bottom: 2rem;
 }
 
+/* Mobile Responsive */
+/* Mobile Responsive - já existe mais abaixo, removendo duplicação */
+
 .chart-card {
   background: rgba(15, 34, 57, 0.6);
   backdrop-filter: blur(12px);
@@ -600,7 +603,20 @@ select option {
   }
   
   .stats-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .stat-value {
+    font-size: 1.25rem;
+  }
+  
+  .stat-title {
+    font-size: 0.875rem;
+  }
+  
+  .chart-card {
+    min-width: 100%;
   }
   
   .charts-section {

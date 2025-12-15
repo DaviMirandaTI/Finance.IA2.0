@@ -14,8 +14,14 @@ export const CATEGORIAS_PADRAO = [
   "Assinaturas",
   "Filha",
   "Dívidas",
+  "Cartão de Crédito",
+  "Taxas e Impostos",
   "Investimento",
   "Impostos",
+  "Trabalho",
+  "Renda",
+  "Transferência",
+  "Transferência Interna",
   "Outros",
 ];
 

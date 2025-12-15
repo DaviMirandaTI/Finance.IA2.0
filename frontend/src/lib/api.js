@@ -240,3 +240,26 @@ export const calcularFaturaAtual = (cartaoId, mes = null) => {
 };
 export const getAlertasVencimento = (diasAntes = 7) =>
   fetchApi(`${API_BASE_URL}/api/cartao/alertas/vencimento?dias_antes=${diasAntes}`);
+export const calcularFaturasFuturas = (cartaoId, mesesAhead = 6) =>
+  fetchApi(`${API_BASE_URL}/api/cartao/${cartaoId}/faturas-futuras?meses_ahead=${mesesAhead}`);
+export const listarFaturasCompletas = (cartaoId, incluirFuturas = true) =>
+  fetchApi(`${API_BASE_URL}/api/cartao/${cartaoId}/faturas-completas?incluir_futuras=${incluirFuturas}`);
+export const exportarFaturaCSV = (cartaoId, mesReferencia) => {
+  return fetch(`${API_BASE_URL}/api/cartao/${cartaoId}/exportar-fatura/${mesReferencia}`, {
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    },
+  }).then(res => {
+    if (!res.ok) throw new Error('Erro ao exportar fatura');
+    return res.blob();
+  }).then(blob => {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fatura_${cartaoId}_${mesReferencia}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  });
+};

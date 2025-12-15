@@ -101,12 +101,23 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchEstatisticas = async () => {
       try {
-        const periodo = periodoTipo === "mes" ? periodoMes : periodoTipo === "ano" ? periodoAno : null;
-        const periodoParam = periodoTipo === "mes" ? { periodoMes: periodo } : periodoTipo === "ano" ? { periodoAno: periodo } : {};
-        const estatisticasData = await getEstatisticasDashboard(periodoParam.periodoMes, periodoParam.periodoAno).catch(() => null);
-        if (estatisticasData) setEstatisticas(estatisticasData);
+        let periodoMesParam = null;
+        let periodoAnoParam = null;
+        
+        if (periodoTipo === "mes" && periodoMes) {
+          periodoMesParam = periodoMes;
+        } else if (periodoTipo === "ano" && periodoAno) {
+          periodoAnoParam = periodoAno;
+        }
+        
+        const estatisticasData = await getEstatisticasDashboard(periodoMesParam, periodoAnoParam).catch((err) => {
+          console.warn("Erro ao buscar estatísticas da API, usando cálculo local:", err);
+          return null;
+        });
+        setEstatisticas(estatisticasData);
       } catch (error) {
         console.error("Erro ao carregar estatísticas:", error);
+        setEstatisticas(null);
       }
     };
     fetchEstatisticas();
@@ -219,8 +230,20 @@ export default function Dashboard() {
     });
   }, [investimentos, periodoTipo, periodoMes, periodoAno, periodoInicio, periodoFim]);
 
-  // Calculate dashboard stats
+  // Calculate dashboard stats (usar estatísticas da API se disponível, senão calcular local)
   const stats = useMemo(() => {
+    // Se temos estatísticas da API, usar elas
+    if (estatisticas) {
+      return {
+        renda: estatisticas.renda_total || 0,
+        despesas: estatisticas.despesas_total || 0,
+        resultado: estatisticas.saldo || 0,
+        totalInvestido: investimentosFiltrados.reduce((sum, inv) => sum + (Number(inv.valor) || 0), 0),
+        categorias: estatisticas.gastos_por_categoria || {},
+      };
+    }
+    
+    // Senão, calcular localmente com os dados filtrados
     const renda = lancamentosFiltrados
       .filter(l => l.tipo === 'entrada')
       .reduce((sum, l) => sum + (Number(l.valor) || 0), 0);
@@ -242,7 +265,7 @@ export default function Dashboard() {
       });
 
     return { renda, despesas, resultado, totalInvestido, categorias };
-  }, [lancamentosFiltrados, investimentosFiltrados]);
+  }, [lancamentosFiltrados, investimentosFiltrados, estatisticas]);
 
   // CRUD Lancamentos
   const salvarLancamento = async (formData) => {
@@ -694,6 +717,9 @@ export default function Dashboard() {
                             saldoPlanejado={pagamentoInteligente.saldoFinal}
                             estatisticas={estatisticas}
                             alertasVencimento={alertasVencimento}
+                            periodoMes={periodoMes}
+                            periodoAno={periodoAno}
+                            periodoTipo={periodoTipo}
                           />
                         )}
                         {currentView === "lancamentos" && (
@@ -761,7 +787,7 @@ export default function Dashboard() {
 }
 
 // Dashboard View
-function DashboardView({ stats, lancamentos, saldoPlanejado, estatisticas, alertasVencimento }) {
+function DashboardView({ stats, lancamentos, saldoPlanejado, estatisticas, alertasVencimento, periodoMes, periodoAno, periodoTipo }) {
   // Usar estatísticas da API se disponível, senão usar stats local
   const topCategoriasData = estatisticas?.top_categorias || Object.entries(stats.categorias || {})
     .sort((a, b) => b[1] - a[1])
@@ -775,21 +801,68 @@ function DashboardView({ stats, lancamentos, saldoPlanejado, estatisticas, alert
 
   const CHART_COLORS = ['#10b981', '#22d3ee', '#a855f7', '#fbbf24', '#f87171'];
   
-  // Dados para gráfico Davi vs Ana
+  // Dados para gráfico Davi vs Ana (usar estatísticas da API ou calcular localmente)
   const gastosPorResponsavel = estatisticas?.gastos_por_responsavel || {};
-  const dadosResponsavel = [
+  
+  // Se não tiver dados da API, calcular localmente dos lançamentos
+  let dadosResponsavel = [
     { name: 'Davi', valor: gastosPorResponsavel['Davi'] || 0 },
     { name: 'Ana', valor: gastosPorResponsavel['Ana'] || 0 },
     { name: 'Outro', valor: gastosPorResponsavel['Outro'] || 0 },
-  ].filter(item => item.valor > 0);
+  ];
   
-  // Dados para gráfico de cartão
+  // Se não tem dados da API, calcular dos lançamentos
+  if (!estatisticas?.gastos_por_responsavel) {
+    const responsavelMap = {};
+    lancamentos
+      .filter(l => l.tipo === 'saida')
+      .forEach(l => {
+        const resp = l.responsavel || 'Outro';
+        responsavelMap[resp] = (responsavelMap[resp] || 0) + (Number(l.valor) || 0);
+      });
+    dadosResponsavel = [
+      { name: 'Davi', valor: responsavelMap['Davi'] || 0 },
+      { name: 'Ana', valor: responsavelMap['Ana'] || 0 },
+      { name: 'Outro', valor: responsavelMap['Outro'] || 0 },
+    ];
+  }
+  
+  dadosResponsavel = dadosResponsavel.filter(item => item.valor > 0);
+  
+  // Dados para gráfico de cartão (usar estatísticas da API ou calcular localmente)
   const usoCartao = estatisticas?.uso_cartao || {};
-  const topCartao = usoCartao.top_categorias || [];
+  let topCartao = usoCartao.top_categorias || [];
+  
+  // Se não tem dados da API, calcular dos lançamentos
+  if (!estatisticas?.uso_cartao) {
+    const cartaoCategorias = {};
+    lancamentos
+      .filter(l => l.tipo === 'saida' && l.forma === 'credito')
+      .forEach(l => {
+        const cat = l.categoria || 'Outros';
+        cartaoCategorias[cat] = (cartaoCategorias[cat] || 0) + (Number(l.valor) || 0);
+      });
+    topCartao = Object.entries(cartaoCategorias)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([categoria, valor]) => ({ categoria, valor }));
+  }
+  
+  const usoCartaoTotal = estatisticas?.uso_cartao?.total || 
+    lancamentos
+      .filter(l => l.tipo === 'saida' && l.forma === 'credito')
+      .reduce((sum, l) => sum + (Number(l.valor) || 0), 0);
+
+  // Título dinâmico baseado no período
+  const tituloPeriodo = periodoTipo === "mes" && periodoMes
+    ? `Resumo de ${new Date(periodoMes + "-01").toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}`
+    : periodoTipo === "ano" && periodoAno
+    ? `Resumo de ${periodoAno}`
+    : "Resumo do Período";
 
   return (
     <div className="view-container" data-testid="dashboard-view">
-      <h1 className="view-title">Resumo Mensal</h1>
+      <h1 className="view-title">{tituloPeriodo}</h1>
       
       <div className="stats-grid">
         <Card className="stat-card renda">
@@ -899,11 +972,11 @@ function DashboardView({ stats, lancamentos, saldoPlanejado, estatisticas, alert
         )}
 
         {/* Gráfico de Cartão de Crédito */}
-        {usoCartao.total > 0 && (
+        {usoCartaoTotal > 0 && (
           <Card className="chart-card">
             <CardHeader>
               <CardTitle>Uso de Cartão de Crédito</CardTitle>
-              <p className="text-sm text-slate-400 mt-1">Total: R$ {usoCartao.total.toFixed(2)}</p>
+              <p className="text-sm text-slate-400 mt-1">Total: R$ {usoCartaoTotal.toFixed(2)}</p>
             </CardHeader>
             <CardContent>
               {topCartao.length > 0 ? (

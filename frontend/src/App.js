@@ -4,6 +4,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Dashboard from './pages/Dashboard';
 import Profile from './pages/Profile';
 import ImportarExtratos from './pages/ImportarExtratos';
+import FaturasCartao from './pages/FaturasCartao';
 
 function App() {
   return (
@@ -32,6 +33,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ImportarExtratos />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cartao/:cartaoId/faturas"
+            element={
+              <ProtectedRoute>
+                <FaturasCartao />
               </ProtectedRoute>
             }
           />
